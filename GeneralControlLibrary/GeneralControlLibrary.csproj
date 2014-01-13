@@ -41,6 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Canvas.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CustomMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>

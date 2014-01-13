@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DivisionByZeroLevelBuilder
 {
-    class Tile
+    public class Tile
     {
         private const int TILE_BLOCKED = 0x1;
         private const int TILE_BUILDABLE = 0x2;
@@ -81,7 +81,7 @@ namespace DivisionByZeroLevelBuilder
         }
     }
 
-    class Map
+    public class Map
     {
         public int mapId;
 

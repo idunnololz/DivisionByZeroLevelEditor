@@ -7,13 +7,25 @@ using System.Windows.Forms;
 
 namespace GeneralControlLibrary
 {
+    interface CustomToolStrip
+    {
+        Color SelectedColor { get; set; }
+    }
+
     class CustomToolStripRenderer : ToolStripProfessionalRenderer
     {
+        CustomToolStrip strip;
+
+        public CustomToolStripRenderer(CustomToolStrip strip)
+        {
+            this.strip = strip;
+        }
+
         protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e) {
 			if (!e.Item.Selected && !e.Item.Pressed){
 				e.Graphics.FillRectangle(new SolidBrush(e.ToolStrip.BackColor), 0, 0, e.Item.Width, e.Item.Height);
 			}else {
-				e.Graphics.FillRectangle(new SolidBrush(Color.LightGray), 0, 0, e.Item.Width, e.Item.Height);
+				e.Graphics.FillRectangle(new SolidBrush(strip.SelectedColor), 0, 0, e.Item.Width, e.Item.Height);
 				//e.Graphics.DrawRectangle(new Pen(Color::FromArgb(32,32,32)), 0, 0, rc.Width - 1, rc.Height - 1);
 			}
 		}
@@ -38,7 +50,8 @@ namespace GeneralControlLibrary
        }
 
 		protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e) {
-			//e.Graphics.FillRectangle(new SolidBrush(Color::FromArgb(64,64,64)), 0, 0, e.ToolStrip.Bounds.Width, e.ToolStrip.Bounds.Height);
+            //base.OnRenderToolStripBackground(e);
+            //e.Graphics.FillRectangle(new SolidBrush(Color::FromArgb(64,64,64)), 0, 0, e.ToolStrip.Bounds.Width, e.ToolStrip.Bounds.Height);
 			//e.Graphics.DrawLine(new Pen(Color::FromArgb(32,32,32)), 20, 3, e.Item.Width, 3);
 
 			//e.Graphics.FillRectangle(new SolidBrush(Color::FromArgb(100,100,100)), 0, 0, e.Item.Width, e.Item.Height);

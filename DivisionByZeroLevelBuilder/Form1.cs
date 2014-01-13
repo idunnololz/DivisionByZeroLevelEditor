@@ -21,6 +21,7 @@ namespace DivisionByZeroLevelBuilder
         private const Int32 BORDER_SIZE = 3;
 
         private const string DATA_FOLDER = "dat";
+        private const string APP_FOLDER = "app";
         private const string FILE_SPRITE_DATA = DATA_FOLDER + @"\sprite.dat";
 
         private Color THEME_COLOR = Color.FromArgb(0, 122, 204);
@@ -57,6 +58,10 @@ namespace DivisionByZeroLevelBuilder
 
             // create folders if needed...
             System.IO.Directory.CreateDirectory(DATA_FOLDER);
+            System.IO.Directory.CreateDirectory(APP_FOLDER);
+
+            RecentList.Instance.Load(APP_FOLDER);
+            startPage1.Refresh();
 
             // try to load our sprite list...
             LoadData();
@@ -116,6 +121,8 @@ namespace DivisionByZeroLevelBuilder
             {
                 cmbTypes.Items.Add(s.typeName);
             }
+
+            OnPathCountChanged();
         }
 
         #region BasicWindowSource
@@ -197,14 +204,14 @@ namespace DivisionByZeroLevelBuilder
 
             if (message.Msg == WM_WINDOWPOSCHANGING)
             {
-                    WINDOWPOS winpos = (WINDOWPOS)message.GetLParam(typeof(WINDOWPOS));
+                WINDOWPOS winpos = (WINDOWPOS)message.GetLParam(typeof(WINDOWPOS));
 
-                    Debug.WriteLine("x: {0} | y: {1} | w: {2} | h: {3}", winpos.x, winpos.y, winpos.cx, winpos.cy);
+                //Debug.WriteLine("x: {0} | y: {1} | w: {2} | h: {3}", winpos.x, winpos.y, winpos.cx, winpos.cy);
 
-                    if ((winpos.flags & SWP_FRAMECHANGED) != 0 && winpos.x < 0 && winpos.y < 0)
-                    {
-                        maxing = true;
-                    }
+                if ((winpos.flags & SWP_FRAMECHANGED) != 0 && winpos.x < 0 && winpos.y < 0)
+                {
+                    maxing = true;
+                }
             }
 
             base.WndProc(ref message);
@@ -305,7 +312,7 @@ namespace DivisionByZeroLevelBuilder
                 case WM_WINDOWPOSCHANGING:
                     WINDOWPOS winpos = (WINDOWPOS)message.GetLParam(typeof(WINDOWPOS));
 
-                    Debug.WriteLine("x: {0} | y: {1} | w: {2} | h: {3}", winpos.x, winpos.y, winpos.cx, winpos.cy);
+                    //Debug.WriteLine("x: {0} | y: {1} | w: {2} | h: {3}", winpos.x, winpos.y, winpos.cx, winpos.cy);
 
                     if ((winpos.flags & SWP_FRAMECHANGED) != 0 && winpos.x < 0 && winpos.y < 0)
                     {
@@ -478,6 +485,13 @@ namespace DivisionByZeroLevelBuilder
         private void frmMain_SizeChanged(object sender, EventArgs e)
         {
             this.Invalidate();
+
+            if (aboutBox.Visible)
+            {
+                aboutBox.Top = (this.Height - aboutBox.Height) / 2;
+                aboutBox.Left = (this.Width - aboutBox.Width) / 2;
+            }
+
         }
 
         private void btnAddItem_Click(object sender, EventArgs e)
@@ -532,6 +546,11 @@ namespace DivisionByZeroLevelBuilder
                 trySetNumericUpDown(txtAmount, wave.spawnCount);
                 trySetNumericUpDown(txtSpawnDelay, wave.spawnDelay);
                 trySetNumericUpDown(txtTimeAllotted, wave.timeAllotted);
+
+                if (pnlSpawnPoint.Visible == true && wave.entrance != '\0')
+                {
+                    cmbSpawnPoint.SelectedIndex = wave.entrance - 'a';
+                }
             }
             else
             {
@@ -549,6 +568,8 @@ namespace DivisionByZeroLevelBuilder
 
         void saveWave(int index)
         {
+            if (index == -1) return;
+
             var wave = waves[index];
             if (cmbTypes.SelectedIndex == -1)
             {
@@ -563,6 +584,7 @@ namespace DivisionByZeroLevelBuilder
             wave.spawnCount = Convert.ToInt32(txtAmount.Value);
             wave.spawnDelay = Convert.ToInt32(txtSpawnDelay.Value);
             wave.timeAllotted = Convert.ToInt32(txtTimeAllotted.Value);
+            wave.entrance = (char)('a' + cmbSpawnPoint.SelectedIndex);
         }
 
         private int lastSelectedIndex = -1;
@@ -611,6 +633,41 @@ namespace DivisionByZeroLevelBuilder
             {
                 e.Graphics.FillRectangle(new SolidBrush(wave.spriteType.color),
                     e.Bounds.Right - 20, e.Bounds.Y, 20, e.Bounds.Height);
+
+                if (e.Index > 0)
+                {
+                    var prevWave = (Wave)lbWaves.Items[e.Index - 1];
+                    if (wave.timeAllotted == 0)
+                    {
+                        if (prevWave.timeAllotted != 0)
+                        {
+                            // this is the first one in the chain!
+                            e.Graphics.FillRectangle(Brushes.DarkGray, e.Bounds.Right - 14,
+                                e.Bounds.Y + 4, 8, e.Bounds.Height - 4);
+                        }
+                        else
+                        {
+                            // fill the whole thing otherwise to connect the chain
+                            e.Graphics.FillRectangle(Brushes.DarkGray, e.Bounds.Right - 14,
+                                e.Bounds.Y, 8, e.Bounds.Height);
+                        }
+                    }
+                    else if (prevWave.timeAllotted == 0)
+                    {
+                        // this is the last one in the chain!
+                        e.Graphics.FillRectangle(Brushes.DarkGray, e.Bounds.Right - 14,
+                            e.Bounds.Y, 8, e.Bounds.Height - 4);
+                    }
+                }
+                else if (e.Index == 0)
+                {
+                    if (wave.timeAllotted == 0)
+                    {
+                        // this is the first one in the chain!
+                        e.Graphics.FillRectangle(Brushes.DarkGray, e.Bounds.Right - 14,
+                            e.Bounds.Y + 4, 8, e.Bounds.Height - 4);
+                    }
+                }
             }
         }
 
@@ -625,9 +682,62 @@ namespace DivisionByZeroLevelBuilder
             UpdateOptions();
         }
 
+        MapEditor mapEditor;
+        AnimationValues valMapEditor = new AnimationValues();
+
+        class AnimationValues
+        {
+            public double c, t, d, b;
+
+            public bool isAlive()
+            {
+                return t < d;
+            }
+        }
+
         private void mapEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (mapEditor == null)
+            {
+                mapEditor = new MapEditor(map);
+                mapEditor.Width = this.Width - 2;
+                mapEditor.Height = this.Height - menuStrip.Top - 1;
+                mapEditor.Height = this.Height - menuStrip.Top - 12;
+                mapEditor.Left = 1;
+                mapEditor.Visible = false;
+                mapEditor.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
 
+                this.Controls.Add(mapEditor);
+                mapEditor.BringToFront();
+            }
+
+            mapEditor.setMap(map);
+
+            mapEditor.Top = mapEditor.Height;
+            mapEditor.Visible = true;
+            valMapEditor.c = (menuStrip.Top) - mapEditor.Height;
+            valMapEditor.t = 0;
+            aniMapEditorIn.Start();
+            valMapEditor.b = mapEditor.Top;
+            valMapEditor.d = 0.7;
+            aniMapEditorIn.Start();
+        }
+
+        private void aniMapEditorIn_Tick(object sender, EventArgs e)
+        {
+            valMapEditor.t += aniMapEditorIn.Interval / 1000.0;
+            if (valMapEditor.isAlive())
+            {
+                double t = valMapEditor.t / valMapEditor.d;
+                t--;
+                double f = valMapEditor.c * (t * t * t + 1) + valMapEditor.b;
+                mapEditor.Top = (int)f;
+            }
+            else
+            {
+                mapEditor.Top = (int)(valMapEditor.c + valMapEditor.b);
+                aniMapEditorIn.Stop();
+            }
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -642,6 +752,9 @@ namespace DivisionByZeroLevelBuilder
                 using (stream)
                 {
                     LoadLevelFromFile(theDialog.FileName);
+
+                    RecentList.Instance.AddRecent(theDialog.FileName, level.Name);
+                    startPage1.Refresh();
                 }
             }
         }
@@ -809,6 +922,8 @@ namespace DivisionByZeroLevelBuilder
                         wave.spawnDelay = Convert.ToInt32(temp[2]);
                         wave.hp = Convert.ToInt32(temp[3]);
                         wave.reward = Convert.ToInt32(temp[4]);
+                        if (temp.Length > 5)
+                            wave.entrance = temp[5][0];
                         waves.Add(wave);
                         break;
                     case TYPE_SLEEP:
@@ -851,6 +966,9 @@ namespace DivisionByZeroLevelBuilder
             // set file...
             file.FileName = filename;
 
+            // update the UI...
+            OnPathCountChanged();
+
         Outside:
             return;
         }
@@ -864,6 +982,7 @@ namespace DivisionByZeroLevelBuilder
         {
             if (file.FileName != null)
             {
+                saveWave(lbWaves.SelectedIndex);
                 using (StreamWriter sw = new StreamWriter(file.FileName))
                 {
                     saveTo(sw);
@@ -1012,12 +1131,33 @@ namespace DivisionByZeroLevelBuilder
 
             foreach (Wave w in level.Waves)
             {
-                sw.WriteLine("{0} {1, -10}{2, -10}{3, -10}{4, -10}{5, -10} // {6}",
-                    TYPE_SPAWN, w.spriteType.typeEnum, w.spawnCount,
-                    w.spawnDelay, w.hp, w.reward, w.index + 1);
+                if (w.spriteType == null)
+                    continue;
+                try
+                {
+                    if (level.Map.PathCount > 1)
+                    {
+                        if (w.entrance == '\0')
+                            w.entrance = 'a';
 
-                if (w.timeAllotted > 0)
-                    sw.WriteLine("{0} {1}", TYPE_SLEEP, w.timeAllotted);
+                        sw.WriteLine("{0} {1, -10}{2, -10}{3, -10}{4, -10}{5, -10}{6, -10} // {7}",
+                            TYPE_SPAWN, w.spriteType.typeEnum, w.spawnCount,
+                            w.spawnDelay, w.hp, w.reward, w.entrance, w.index + 1);
+                    }
+                    else
+                    {
+                        sw.WriteLine("{0} {1, -10}{2, -10}{3, -10}{4, -10}{5, -10} // {6}",
+                            TYPE_SPAWN, w.spriteType.typeEnum, w.spawnCount,
+                            w.spawnDelay, w.hp, w.reward, w.index + 1);
+                    }
+
+                    if (w.timeAllotted > 0)
+                        sw.WriteLine("{0} {1}", TYPE_SLEEP, w.timeAllotted);
+                }
+                catch (Exception e)
+                {
+                    Debug.Write(e.StackTrace);
+                }
             }
         }
 
@@ -1142,6 +1282,11 @@ namespace DivisionByZeroLevelBuilder
                     e.Cancel = true;
                     break;
             }
+
+            if (!e.Cancel)
+            {
+                RecentList.Instance.Save(APP_FOLDER);
+            }
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1177,6 +1322,24 @@ namespace DivisionByZeroLevelBuilder
             else
             {
                 return DialogResult.No;
+            }
+        }
+
+        private void OnPathCountChanged()
+        {
+            if (level.Map.PathCount < 2)
+            {
+                pnlSpawnPoint.Visible = false;
+            }
+            else
+            {
+                cmbSpawnPoint.Items.Clear();
+
+                for (int i = 0; i < level.Map.PathCount; i++)
+                {
+                    cmbSpawnPoint.Items.Add((char)('a' + i));
+                }
+                pnlSpawnPoint.Visible = true;
             }
         }
 
@@ -1232,5 +1395,26 @@ namespace DivisionByZeroLevelBuilder
         {
             startAboutIn();
         }
+
+        private void startPage1_ItemSelected(object sender, StartPage.RecentEventArgs e)
+        {
+            LoadLevelFromFile(e.ItemSelected.fullPath);
+
+            RecentList.Instance.AddRecent(e.ItemSelected.fullPath, level.Name);
+            startPage1.Refresh();
+            startPage1.Hide();
+        }
+
+        private void startPage1_NewLevelClick(object sender, EventArgs e)
+        {
+            newToolStripMenuItem_Click(sender, e);
+            startPage1.Hide();
+        }
+
+        private void startPage1_ItemSelected_1(object sender, StartPage.RecentEventArgs e)
+        {
+
+        }
+
     }
 }

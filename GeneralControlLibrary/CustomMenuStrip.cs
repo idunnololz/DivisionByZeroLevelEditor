@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace GeneralControlLibrary
 {
-    public class CustomMenuStrip : MenuStrip
+    public class CustomMenuStrip : MenuStrip, CustomToolStrip
     {
         [Description("The background color when the item is selected."), Category("Appearance")]
         public Color SelectedColor
@@ -20,7 +20,7 @@ namespace GeneralControlLibrary
 
         public CustomMenuStrip()
         {
-            Renderer = new CustomToolStripRenderer();
+            Renderer = new CustomToolStripRenderer(this);
         }
 
         protected override void OnPaintBackground(PaintEventArgs e) {
@@ -30,7 +30,7 @@ namespace GeneralControlLibrary
 		protected override void OnPaint(PaintEventArgs e) {
 			Graphics g = e.Graphics;
 
-			for(int i = 0; i < Items.Count; i++){
+			for(int i = 0; i < Items.Count; i++){                
 				if(Items[i].Bounds.IntersectsWith(e.ClipRectangle)){
 					// need to draw this...
 					Rectangle r = Items[i].Bounds;

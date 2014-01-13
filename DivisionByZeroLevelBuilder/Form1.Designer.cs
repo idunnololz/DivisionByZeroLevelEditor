@@ -31,8 +31,9 @@
             this.components = new System.ComponentModel.Container();
             this.btnAddItem = new System.Windows.Forms.Button();
             this.pnlMain = new System.Windows.Forms.Panel();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.pnlSpawnPoint = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
+            this.cmbSpawnPoint = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblTotalGold = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -56,6 +57,10 @@
             this.txtLevelName = new System.Windows.Forms.TextBox();
             this.btnAcceptName = new System.Windows.Forms.Button();
             this.cmbDifficulty = new System.Windows.Forms.ComboBox();
+            this.aniAboutIn = new System.Windows.Forms.Timer(this.components);
+            this.aniMapEditorIn = new System.Windows.Forms.Timer(this.components);
+            this.startPage1 = new DivisionByZeroLevelBuilder.StartPage();
+            this.aboutBox = new DivisionByZeroLevelBuilder.AboutBox();
             this.lbWaves = new GeneralControlLibrary.DoubleBufferedListBox();
             this.tlblTitle = new GeneralControlLibrary.TransparentLabel();
             this.btnMin = new GeneralControlLibrary.WindowControl();
@@ -75,9 +80,8 @@
             this.mapEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hELPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aniAboutIn = new System.Windows.Forms.Timer(this.components);
-            this.aboutBox = new DivisionByZeroLevelBuilder.AboutBox();
             this.pnlMain.SuspendLayout();
+            this.pnlSpawnPoint.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtTimeAllotted)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtReward)).BeginInit();
@@ -105,8 +109,7 @@
             // 
             this.pnlMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pnlMain.Controls.Add(this.comboBox1);
-            this.pnlMain.Controls.Add(this.label8);
+            this.pnlMain.Controls.Add(this.pnlSpawnPoint);
             this.pnlMain.Controls.Add(this.groupBox1);
             this.pnlMain.Controls.Add(this.txtTimeAllotted);
             this.pnlMain.Controls.Add(this.label5);
@@ -120,29 +123,38 @@
             this.pnlMain.Controls.Add(this.label2);
             this.pnlMain.Controls.Add(this.label1);
             this.pnlMain.Controls.Add(this.cmbTypes);
-            this.pnlMain.Location = new System.Drawing.Point(148, 75);
+            this.pnlMain.Location = new System.Drawing.Point(148, 81);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(276, 191);
             this.pnlMain.TabIndex = 7;
             this.pnlMain.Visible = false;
             // 
-            // comboBox1
+            // pnlSpawnPoint
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(76, 114);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(60, 21);
-            this.comboBox1.TabIndex = 14;
+            this.pnlSpawnPoint.Controls.Add(this.label8);
+            this.pnlSpawnPoint.Controls.Add(this.cmbSpawnPoint);
+            this.pnlSpawnPoint.Location = new System.Drawing.Point(6, 106);
+            this.pnlSpawnPoint.Name = "pnlSpawnPoint";
+            this.pnlSpawnPoint.Size = new System.Drawing.Size(135, 30);
+            this.pnlSpawnPoint.TabIndex = 4;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 117);
+            this.label8.Location = new System.Drawing.Point(-3, 6);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(67, 13);
             this.label8.TabIndex = 13;
             this.label8.Text = "Spawn Point";
+            // 
+            // cmbSpawnPoint
+            // 
+            this.cmbSpawnPoint.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSpawnPoint.FormattingEnabled = true;
+            this.cmbSpawnPoint.Location = new System.Drawing.Point(70, 3);
+            this.cmbSpawnPoint.Name = "cmbSpawnPoint";
+            this.cmbSpawnPoint.Size = new System.Drawing.Size(60, 21);
+            this.cmbSpawnPoint.TabIndex = 14;
             // 
             // groupBox1
             // 
@@ -364,7 +376,7 @@
             // 
             this.lblLevelName.AutoSize = true;
             this.lblLevelName.Font = new System.Drawing.Font("Meiryo UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLevelName.Location = new System.Drawing.Point(7, 51);
+            this.lblLevelName.Location = new System.Drawing.Point(7, 57);
             this.lblLevelName.Name = "lblLevelName";
             this.lblLevelName.Size = new System.Drawing.Size(99, 20);
             this.lblLevelName.TabIndex = 12;
@@ -377,7 +389,7 @@
             this.lblDifficulty.AutoSize = true;
             this.lblDifficulty.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDifficulty.ForeColor = System.Drawing.Color.Gray;
-            this.lblDifficulty.Location = new System.Drawing.Point(112, 57);
+            this.lblDifficulty.Location = new System.Drawing.Point(112, 63);
             this.lblDifficulty.Name = "lblDifficulty";
             this.lblDifficulty.Size = new System.Drawing.Size(65, 14);
             this.lblDifficulty.TabIndex = 13;
@@ -387,7 +399,7 @@
             // txtLevelName
             // 
             this.txtLevelName.Font = new System.Drawing.Font("Meiryo UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtLevelName.Location = new System.Drawing.Point(11, 48);
+            this.txtLevelName.Location = new System.Drawing.Point(11, 54);
             this.txtLevelName.Name = "txtLevelName";
             this.txtLevelName.Size = new System.Drawing.Size(131, 28);
             this.txtLevelName.TabIndex = 14;
@@ -417,13 +429,44 @@
             "Hard",
             "Brutal",
             "EX"});
-            this.cmbDifficulty.Location = new System.Drawing.Point(183, 55);
+            this.cmbDifficulty.Location = new System.Drawing.Point(183, 61);
             this.cmbDifficulty.Name = "cmbDifficulty";
             this.cmbDifficulty.Size = new System.Drawing.Size(121, 22);
             this.cmbDifficulty.TabIndex = 16;
             this.cmbDifficulty.Visible = false;
             this.cmbDifficulty.DropDownClosed += new System.EventHandler(this.cmbDifficulty_DropDownClosed);
             this.cmbDifficulty.MouseDown += new System.Windows.Forms.MouseEventHandler(this.cmbDifficulty_MouseDown);
+            // 
+            // aniAboutIn
+            // 
+            this.aniAboutIn.Interval = 15;
+            this.aniAboutIn.Tick += new System.EventHandler(this.aniAboutIn_Tick);
+            // 
+            // aniMapEditorIn
+            // 
+            this.aniMapEditorIn.Interval = 15;
+            this.aniMapEditorIn.Tick += new System.EventHandler(this.aniMapEditorIn_Tick);
+            // 
+            // startPage1
+            // 
+            this.startPage1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.startPage1.BackColor = System.Drawing.SystemColors.Control;
+            this.startPage1.Location = new System.Drawing.Point(70, 68);
+            this.startPage1.Name = "startPage1";
+            this.startPage1.Size = new System.Drawing.Size(312, 220);
+            this.startPage1.TabIndex = 18;
+            this.startPage1.ItemSelected += new DivisionByZeroLevelBuilder.StartPage.ItemSelectedEventHandler(this.startPage1_ItemSelected);
+            this.startPage1.NewLevelClick += new DivisionByZeroLevelBuilder.StartPage.NewLevelClickEventHandler(this.startPage1_NewLevelClick);
+            // 
+            // aboutBox
+            // 
+            this.aboutBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.aboutBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.aboutBox.Location = new System.Drawing.Point(401, 283);
+            this.aboutBox.Name = "aboutBox";
+            this.aboutBox.Size = new System.Drawing.Size(334, 152);
+            this.aboutBox.TabIndex = 17;
+            this.aboutBox.Visible = false;
             // 
             // lbWaves
             // 
@@ -433,7 +476,7 @@
             this.lbWaves.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lbWaves.FormattingEnabled = true;
             this.lbWaves.IntegralHeight = false;
-            this.lbWaves.Location = new System.Drawing.Point(11, 75);
+            this.lbWaves.Location = new System.Drawing.Point(11, 81);
             this.lbWaves.Name = "lbWaves";
             this.lbWaves.Size = new System.Drawing.Size(131, 191);
             this.lbWaves.TabIndex = 9;
@@ -492,16 +535,15 @@
             this.eDITToolStripMenuItem,
             this.tOOLSToolStripMenuItem,
             this.hELPToolStripMenuItem});
-            this.menuStrip.Location = new System.Drawing.Point(1, 24);
+            this.menuStrip.Location = new System.Drawing.Point(1, 30);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.SelectedColor = System.Drawing.SystemColors.Control;
+            this.menuStrip.SelectedColor = System.Drawing.Color.LightGray;
             this.menuStrip.Size = new System.Drawing.Size(193, 24);
             this.menuStrip.TabIndex = 11;
             this.menuStrip.Text = "customMenuStrip1";
             // 
             // fILEToolStripMenuItem
             // 
-            this.fILEToolStripMenuItem.AutoSize = false;
             this.fILEToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
             this.toolStripMenuItem2,
@@ -605,21 +647,6 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // aniAboutIn
-            // 
-            this.aniAboutIn.Interval = 15;
-            this.aniAboutIn.Tick += new System.EventHandler(this.aniAboutIn_Tick);
-            // 
-            // aboutBox
-            // 
-            this.aboutBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.aboutBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.aboutBox.Location = new System.Drawing.Point(401, 283);
-            this.aboutBox.Name = "aboutBox";
-            this.aboutBox.Size = new System.Drawing.Size(334, 152);
-            this.aboutBox.TabIndex = 17;
-            this.aboutBox.Visible = false;
-            // 
             // frmMain
             // 
             this.AcceptButton = this.btnAcceptName;
@@ -628,6 +655,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(436, 300);
             this.ControlBox = false;
+            this.Controls.Add(this.startPage1);
             this.Controls.Add(this.aboutBox);
             this.Controls.Add(this.cmbDifficulty);
             this.Controls.Add(this.btnAcceptName);
@@ -653,6 +681,8 @@
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.frmMain_Paint);
             this.pnlMain.ResumeLayout(false);
             this.pnlMain.PerformLayout();
+            this.pnlSpawnPoint.ResumeLayout(false);
+            this.pnlSpawnPoint.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtTimeAllotted)).EndInit();
@@ -719,7 +749,10 @@
         private System.Windows.Forms.Timer aniAboutIn;
         private AboutBox aboutBox;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cmbSpawnPoint;
+        private System.Windows.Forms.Panel pnlSpawnPoint;
+        private System.Windows.Forms.Timer aniMapEditorIn;
+        private StartPage startPage1;
 
     }
 }
